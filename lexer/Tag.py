@@ -11,4 +11,6 @@ class Tag:
     RP=263
     INT=264
     FLOAT=265
+    POW=266
+    INVALID=-1
     
