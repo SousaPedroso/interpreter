@@ -1,4 +1,4 @@
-from Invalid import Invalid
+from .Invalid import Invalid
 from .Pow import Pow
 from .Int import Int
 from .Float import Float
