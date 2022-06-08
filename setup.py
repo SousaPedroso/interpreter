@@ -6,5 +6,5 @@ with open("README.md") as f:
 setup(
     name='compiler',
     long_description=readme,
-    packages=find_packages(where="lexer", exclude=["main", "tests"])
+    packages=find_packages(where="compiler", exclude=["main", "tests"])
 )
