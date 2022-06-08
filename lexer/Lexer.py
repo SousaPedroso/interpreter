@@ -79,30 +79,39 @@ class Lexer:
 
 
         if self.stop_pos != self.tam and self.state[pos] == '[':
+            self.stop_pos = pos+1
             return LB()
 
         if self.stop_pos != self.tam and self.state[pos] == ']':
+            self.stop_pos = pos+1
             return RB()
 
         if self.stop_pos != self.tam and self.state[pos] == '(':
+            self.stop_pos = pos+1
             return LP()
 
         if self.stop_pos != self.tam and self.state[pos] == ')':
+            self.stop_pos = pos+1
             return RP()
 
         if self.stop_pos != self.tam and self.state[pos] == '+':
+            self.stop_pos = pos+1
             return Sum()
 
         if self.stop_pos != self.tam and self.state[pos] == '-':
+            self.stop_pos = pos+1
             return Sub()
 
         if self.stop_pos != self.tam and self.state[pos] == '*':
+            self.stop_pos = pos+1
             return Mul()
 
         if self.stop_pos != self.tam and self.state[pos] == '/':
+            self.stop_pos = pos+1
             return Div()
 
         if self.stop_pos != self.tam and self.state[pos] == '^':
+            self.stop_pos = pos+1
             return Pow()
 
         # Neither of types
