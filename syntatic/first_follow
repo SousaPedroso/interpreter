@@ -1,0 +1,9 @@
+First(E) = +, -, First(T)= +, -, *, /, ^, exp, (, id
+First(T) = *, /, First(P) = *, /, ^, exp, (, id
+First(P) = ^, exp, First(F) = ^, exp, (, id
+First(F) = (, id
+
+Follow(E) = ), +, -, $
+Follow(T) = Follow(E), *, / = ), +, -, $, *, /
+Follow(P) = Follow(T), ^ = ), +, -, $, *, /, ^
+Follow(F) = Follow(P) | ] = ), +, -, $, *, /, ^, ]
