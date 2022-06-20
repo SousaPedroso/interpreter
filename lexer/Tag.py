@@ -12,5 +12,6 @@ class Tag:
     INT=264
     FLOAT=265
     POW=266
+    EOS=267
     INVALID=-1
     
