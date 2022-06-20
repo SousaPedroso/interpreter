@@ -1,6 +1,6 @@
-First(E) = +, -, First(T)= +, -, *, /, ^, exp, (, id
-First(T) = *, /, First(P) = *, /, ^, exp, (, id
-First(P) = ^, exp, First(F) = ^, exp, (, id
+First(E) = First(T)= exp, (, id
+First(T) = First(P) = exp, (, id
+First(P) = exp, First(F) = exp, (, id
 First(F) = (, id
 
 Follow(E) = ), +, -, $
