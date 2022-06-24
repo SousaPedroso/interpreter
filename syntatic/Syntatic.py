@@ -55,9 +55,8 @@ class Syntatic:
         for inp in range(self.current, len(self.inputs)):
 
             while not(self.accepted):
-                # print(self.states, self.inputs[inp])
                 # Int or Float must be checked as id
-                if inputs[inp][0].tag == Tag.INT or inputs[inp][0] == Tag.FLOAT:
+                if inputs[inp][0].tag == Tag.INT or inputs[inp][0].tag == Tag.FLOAT:
                     value = "id"
                 else:
                     if inputs[inp][0].tag != Tag.EXP:
