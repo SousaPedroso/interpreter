@@ -11,6 +11,7 @@ from.RB import RB
 from .RP import RP
 from .Sub import Sub
 from .Sum import Sum
+from .EOS import EOS
 
 digits = set(['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'])
 exp = 'exp'
@@ -46,7 +47,7 @@ class Lexer:
 
 
             # Checks if Int or Float
-            if self.state[pos] == '.':
+            if self.state[pos] == ',':
                 precision = 0
                 pos += 1
                 while (pos != self.tam and self.state[pos] in digits):
@@ -54,7 +55,7 @@ class Lexer:
                     pos += 1
 
                 self.stop_pos = pos
-                v = float(f"{v}.{precision}")
+                v = f"{v},{precision}"
                 return Float(v)
 
             else:
@@ -114,7 +115,10 @@ class Lexer:
             self.stop_pos = pos+1
             return Pow()
 
-        # Neither of types
-        t = Invalid('')
+        if self.stop_pos == self.tam:
+            # Last token
+            return EOS()
 
-        return t
+        # Invalid token
+        else:
+            return Invalid(self.state[pos])
