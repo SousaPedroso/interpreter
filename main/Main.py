@@ -13,7 +13,7 @@ def main():
     last_line = lexer.line
     # Recover the values
     entradas = [[token.value]]
-    while token.tag != Tag.INVALID:
+    while token.tag != Tag.EOS:
         print(token.value)
         token = lexer.get_token()
         if last_line == lexer.line:
@@ -24,16 +24,9 @@ def main():
             # $
             inputs[-1].append(EOS())
             inputs.append([token])
-            entradas.append([token.value])
 
         last_line = lexer.line
 
-    # Remove invalid token
-    del(inputs[-1][-1])
-    # Add EOS
-    inputs[-1].append(EOS())
-    # Remove invalid token
-    del(entradas[-1][-1])
     syntatic = Syntatic(inputs, alert=True)
     accepted_sentence = syntatic.evaluate_input()
     while accepted_sentence:
