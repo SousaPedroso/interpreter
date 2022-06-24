@@ -1,4 +1,4 @@
-from .Invalid import Invalid
+from .InvalidTokenError import InvalidTokenError
 from .Pow import Pow
 from .Int import Int
 from .Float import Float
@@ -76,7 +76,7 @@ class Lexer:
                 return Exp()
 
             else:
-                return Invalid(self.state[pos:self.stop_pos])
+                raise InvalidTokenError(f"Invalid token {self.state[pos:pos+exp_pos+1]} at line {self.line}")
 
 
         if self.stop_pos != self.tam and self.state[pos] == '[':
@@ -121,4 +121,4 @@ class Lexer:
 
         # Invalid token
         else:
-            return Invalid(self.state[pos])
+            raise InvalidTokenError(f"Invalid token {self.state[pos]} at line {self.line}")
