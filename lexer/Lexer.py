@@ -47,7 +47,7 @@ class Lexer:
 
 
             # Checks if Int or Float
-            if self.state[pos] == ',':
+            if pos != self.tam and self.state[pos] == ',':
                 precision = 0
                 pos += 1
                 while (pos != self.tam and self.state[pos] in digits):
