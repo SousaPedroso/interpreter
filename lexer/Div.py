@@ -5,3 +5,4 @@ class Div(Token):
 
     def __init__(self):
         super().__init__(Tag.DIV)
+        self.value = "/"
