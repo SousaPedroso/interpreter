@@ -55,7 +55,7 @@ class Lexer:
                     pos += 1
 
                 self.stop_pos = pos
-                v = f"{v},{precision}"
+                v = float(f"{v}.{precision}")
                 return Float(v)
 
             else:
