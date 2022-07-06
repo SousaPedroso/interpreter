@@ -26,23 +26,54 @@ class Syntatic:
     {"T": {")": ["r", "E", 3], "*": ["s", 10], "/": ["s", 11], "+": ["r", "E", 3], "-": ["r", "E", 3], "$": ["r", "E", 3]}}, #I15
     {"T": {")": ["r", "P", 3], "^": ["r", "P", 3], "*": ["r", "P", 3], "/": ["r", "P", 3], "+": ["r", "P", 3], "-": ["r", "P", 3], "$": ["r", "P", 3]}}, #16
     {"T": {")": ["r", "T", 3], "^": ["s", 12], "*": ["r", "T", 3], "/": ["r", "T", 3], "+": ["r", "T", 3], "-": ["r", "T", 3], "$": ["r", "T", 3]}}, #I17
-    {"T": {")": ["r", "T", 3], "*": ["r", "T", 3], "/": ["r", "T", 3], "+": ["r", "T", 3], "-": ["r", "T", 3], "$": ["r", "T", 3]}}, #I18
+    {"T": {")": ["r", "T", 3], "^": ["s", 12], "*": ["r", "T", 3], "/": ["r", "T", 3], "+": ["r", "T", 3], "-": ["r", "T", 3], "$": ["r", "T", 3]}}, #I18
     {"T": {"]": ["s", 20]}}, #I19
     {"T": {")": ["r", "P", 4], "^": ["r", "P", 4], "*": ["r", "P", 4], "/": ["r", "P", 4], "+": ["r", "P", 4], "-": ["r", "P", 4], "$": ["r", "P", 4]}}, #I20
     {"T": {")": ["s", 22], "+": ["s", 8], "-": ["s", 9]}}, #I21
     {"T": {")": ["r", "F", 3], "]": ["r", "F", 3], "^": ["r", "F", 3], "*": ["r", "F", 3], "/": ["r", "F", 3], "+": ["r", "F", 3], "-": ["r", "F", 3], "$": ["r", "F", 3]}}] # I22
+
+    # Types for each rule
+    # I: Ihnerate (for symbol only, actually it is a synthetized attribute)
+    # A: Add
+    # S: Sub
+    # M: Mult
+    # D: Div
+    # P: Power
+    # E: exp
+
+    # Defines how each non terminal will be updated according to the operation
+    operations = {"I": lambda E: E, "A": lambda E, T:  E+T, "S": lambda E, T:  E-T,
+    "M": lambda T, P: T*P, "D": lambda T, P: T/P, "P": lambda P, F: P**F, "E": lambda F: 2.71828**F}
+
+    # Stores the rules to recover the value for each operation
+    rules = {
+        2: {")": "I", "+": "I", "-": "I", "$": "I"},
+        3: {")": "I", "*": "I", "/": "I", "+": "I", "-": "I", "$": "I"},
+        5: {")": "I", "^": "I", "*": "I", "/": "I", "+": "I", "-": "I", "$": "I"},
+        7: {")": "I", "]": "I", "^": "I", "*": "I", "/": "I", "+": "I", "-": "I", "$": "I"},
+        14: {")": "A", "+": "A", "-": "A", "$": "A"},
+        15: {")": "S", "+": "S", "-": "S", "$": "S"},
+        16: {")": "P", "^": "P", "*": "P", "/": "P", "+": "P", "-": "P", "$": "P"},
+        17: {")": "M", "*": "M", "/": "M", "+": "M", "-": "M", "$": "M"},
+        18: {")": "D", "*": "D", "/": "D", "+": "D", "-": "D", "$": "D"},
+        20: {")": "E", "^": "E", "*": "E", "/": "E", "+": "E", "-": "E", "$": "E"},
+        22: {")": "I", "]": "I", "^": "I", "*": "I", "/": "I", "+": "I", "-": "I", "$": "I"}
+    }
 
     def __init__(self, inputs, alert=False):
         self.alert = alert
         self.current = 0 # Current input
         self.inputs = inputs
         self.reset_state()
-
         # S indicates for which value the state must be updated
         # R has two values, 1 string for indicate which token will substitute the current(s) and
         # a integer indicating the number of tokens to remove
 
     def reset_state(self):
+        # Stores the symbols and update the values for each operation
+        # Remembering that "E" contains the final result
+        # "id" is here just for facilitate the operations
+        self.non_terminals = {"E": 0, "T": 0, "P": 0, "F": 0, "id": 0}
         self.states = [0]
         self.symbols = []
         self.action = "T" # Search on Terminals or NonTerminals
@@ -51,13 +82,19 @@ class Syntatic:
     def evaluate_input(self):
         # Abbreviation
         inputs = self.inputs
-        print(self.current)
+
+        # Print the current input
+        if self.current < len(inputs):
+            print(f"Input {self.current+1}")
+
         for inp in range(self.current, len(self.inputs)):
 
             while not(self.accepted):
                 # Int or Float must be checked as id
                 if inputs[inp][0].tag == Tag.INT or inputs[inp][0].tag == Tag.FLOAT:
                     value = "id"
+                    # Store the value for the terminal symbol
+                    self.non_terminals["id"] = inputs[inp][0].value
                 else:
                     if inputs[inp][0].tag != Tag.EXP:
                         value = inputs[inp][0].value
@@ -82,24 +119,55 @@ class Syntatic:
                         # reduce
                         elif action[0] != 'acc':
                             if self.alert:
-                                print("Reduce ", end="")
+                                print("Reduced ", end="")
+
+                            # Get the rule for the value
+                            rule = self.rules.get(self.states[-1])
+                            rule_type = rule.get(value)
+
+                            # Store the symbol position to print it
+                            symbol = len(self.symbols)-action[2]
+
+                            if rule_type == "I":
+                                # Non terminals assignment
+                                if action[2] == 1:
+                                    self.non_terminals[action[1]] = self.operations.get("I")(self.non_terminals[self.symbols[-1]])
+
+                                # (E)
+                                else:
+                                    self.non_terminals[action[1]] = self.operations.get("I")(self.non_terminals[self.symbols[symbol+1]])
+
+                            # other operations except exp
+                            elif action[2] == 3:
+                                # Make the operation considering the values for both symbols
+
+                                self.non_terminals[action[1]] = self.operations.get(rule_type)(
+                                    self.non_terminals[self.symbols[symbol]], self.non_terminals[self.symbols[-1]])
+
+                            # exp operation
+                            else:
+                                # Pass the value of non terminal
+                                non_terminal = self.non_terminals[self.symbols[symbol+2]]
+                                self.non_terminals[action[1]] = self.operations.get("E")(non_terminal)
 
                             # Remove symbols
                             for _ in range(action[2]):
                                 if self.alert:
-                                    print(self.symbols[-1], end=" ")
-                                del(self.symbols[-1])
+                                    print(self.symbols[symbol], end="")
+                                del(self.symbols[symbol])
                                 del(self.states[-1])
 
+                            # Update the last 
                             # Add the correspondent symbol
                             self.symbols.append(action[1])
                             # Check for next Nonterminal
                             self.action = 'N'
                             if self.alert:
-                                print(f"to {action[1]}")
+                                print(f" to {action[1]}")
 
                         # accepted sentence
                         else:
+                            print(f"Value for the input {self.current+1}: {self.non_terminals['E']}")
                             self.accepted = True
                             self.current += 1
                             self.reset_state()
@@ -107,6 +175,7 @@ class Syntatic:
 
                     # Syntax error
                     else:
+                        # TO-DO: Considerate the input instead of the symbol
                         raise SyntaxError(f"Unexpected {value} after {self.symbols[-1]}")
                     
                 # Update state
