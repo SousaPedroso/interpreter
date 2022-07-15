@@ -4,7 +4,7 @@ with open("README.md") as f:
     readme = f.read()
 
 setup(
-    name='compiler',
+    name='interpreter',
     long_description=readme,
-    packages=find_packages(where="compiler", exclude=["main", "tests"])
+    packages=find_packages(where="interpreter", exclude=["main", "tests"])
 )
