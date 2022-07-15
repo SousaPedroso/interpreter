@@ -14,7 +14,7 @@ def main():
     # Recover the values
     entradas = [[token.value]]
     while token.tag != Tag.EOS:
-        print(token.value)
+        # print(token.value)
         token = lexer.get_token()
         if last_line == lexer.line:
             inputs[-1].append(token)
@@ -27,7 +27,7 @@ def main():
 
         last_line = lexer.line
 
-    syntatic = Syntatic(inputs, alert=True)
+    syntatic = Syntatic(inputs, alert=False)
     accepted_sentence = syntatic.evaluate_input()
     while accepted_sentence:
         accepted_sentence = syntatic.evaluate_input()
