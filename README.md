@@ -1,6 +1,6 @@
 <h1 align="center">Interpreter of arithmetic operations</h1>
 
-This repository contains the final project os Compiler I subject at UFMT proposed by the professor <a href="https://github.com/thesivis">Raphael</a>.
+This repository contains the final project of Compiler I subject at UFMT proposed by the professor <a href="https://github.com/thesivis">Raphael</a>.
 
 The valid tokens of the language can be seen according to the following automata.
 
