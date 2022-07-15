@@ -75,7 +75,7 @@ class Syntatic:
         # Stores the symbols and update the values for each operation
         # Remembering that "E" contains the final result
         # "id" is here just for facilitate the operations
-        self.non_terminals = {"E": [], "T": 0, "P": 0, "F": 0, "id": 0}
+        self.non_terminals = {"E": [], "T": [], "P": [], "F": [], "id": 0}
         self.states = [0]
         self.symbols = []
         self.action = "T" # Search on Terminals or NonTerminals
@@ -85,8 +85,10 @@ class Syntatic:
         # this rule is used the same way as E -> T
 
         # E -> T, probably must save this result and not just override (rule 3)
-
         # E must be a list, with a initial value, appending the values
+
+        # Para cada terminal, pode haver recursão, Assim
+        # Uma pilha deve ser salva para cada um, permitindo recuperar valores
 
     def evaluate_input(self):
         # Abbreviation
@@ -118,7 +120,7 @@ class Syntatic:
                         # Push state and symbols
                         # Check shift
                         if action[0] != 'acc' and action[0] == 's':
-                            if self.alert or self.current == 14:
+                            if self.alert:
                                 print(f"Shift to {action[1]}")
 
                             self.states.append(action[1])
@@ -129,8 +131,7 @@ class Syntatic:
                         # reduce
                         elif action[0] != 'acc':
 
-                            if self.alert or self.current == 14:
-                                print(self.non_terminals)
+                            if self.alert:
                                 print("Reduced ", end="")
 
                             # Get the rule for the value
@@ -140,42 +141,38 @@ class Syntatic:
                             # Store the symbol position to print it
                             symbol = len(self.symbols)-action[2]
 
+                            # print(rule_type, self.non_terminals)
                             if rule_type == "I":
-                                # Non terminals assignment
-                                if action[1] != 'E':
-                                    self.non_terminals[action[1]] = self.operations.get("I")(self.non_terminals[self.symbols[-1]])
+                                # Push the value
+                                # Can be removed from other stack (if not id)
+                                if self.symbols[-1] != "id":
+                                    self.non_terminals[action[1]].append(self.non_terminals[self.symbols[-1]][-1])
+                                    self.operations.get("R")(self.non_terminals[self.symbols[-1]])
 
-                                # push the value
                                 else:
-                                    self.non_terminals["E"].append(self.non_terminals[self.symbols[-1]])
+                                    self.non_terminals[action[1]].append(self.non_terminals[self.symbols[-1]])
+
 
                             # F -> (E)
                             elif rule_type == "R":
-                                self.non_terminals["F"] = self.non_terminals["E"][-1]
+                                self.non_terminals["F"].append(self.non_terminals["E"][-1])
                                 self.operations.get("R")(self.non_terminals["E"])
 
                             # other operations except exp
                             elif action[2] == 3:
                                 # Make the operation considering the values for both symbols
-
-                                # If E is present, we must get the last element from the stack
-                                if (self.symbols[symbol] != "E"):
-                                    self.non_terminals[action[1]] = self.operations.get(rule_type)(
-                                        self.non_terminals[self.symbols[symbol]], self.non_terminals[self.symbols[-1]])
-
-                                else:
-                                    self.non_terminals["E"][-1] = self.operations.get(rule_type)(
-                                        self.non_terminals["E"][-1], self.non_terminals[self.symbols[-1]])
+                                self.non_terminals[action[1]][-1] = self.operations.get(rule_type)(
+                                    self.non_terminals[self.symbols[symbol]][-1], self.non_terminals[self.symbols[-1]][-1])
 
                             # exp operation
                             else:
                                 # Pass the value of non terminal
-                                non_terminal = self.non_terminals[self.symbols[symbol+2]]
-                                self.non_terminals[action[1]] = self.operations.get("E")(non_terminal)
+                                non_terminal = self.non_terminals[self.symbols[symbol+2]][-1]
+                                self.non_terminals[action[1]][-1] = self.operations.get("E")(non_terminal)
 
                             # Remove symbols
                             for _ in range(action[2]):
-                                if self.alert or self.current == 14:
+                                if self.alert:
                                     print(self.symbols[symbol], end="")
                                 del(self.symbols[symbol])
                                 del(self.states[-1])
@@ -185,12 +182,13 @@ class Syntatic:
                             self.symbols.append(action[1])
                             # Check for next Nonterminal
                             self.action = 'N'
-                            if self.alert or self.current == 14:
+                            if self.alert:
                                 print(f" to {action[1]}")
 
                         # accepted sentence
                         else:
-                            print(f"Value for the input {self.current+1}: {self.non_terminals['E'][0]}")
+                            # First value of the stack (and probably the only one)
+                            print(f"Value for the input {self.current+1}: {str(self.non_terminals['E'][0]).replace('.', ',')}")
                             self.accepted = True
                             self.current += 1
                             self.reset_state()
@@ -198,14 +196,19 @@ class Syntatic:
 
                     # Syntax error
                     else:
-                        raise SyntaxError(f"Unexpected {value} after {last_input.value}")
+                        # Need more values
+                        if value != "$":
+                            raise SyntaxError(f"Unexpected {value} after {last_input.value}")
+
+                        else:
+                            raise SyntaxError(f"It was expected a sentence or value after {last_input.value}")
                     
                 # Update state
                 else:
                     action = self.table[self.states[-1]]
                     self.states.append(action.get("N").get(self.symbols[-1]))
                     self.action = 'T'
-                    if self.alert or self.current == 14:
+                    if self.alert:
                         print(f"Deviation for state {self.states[-1]}")
 
         return False
